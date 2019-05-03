@@ -1,0 +1,26 @@
+<div class="wrapper">
+    <form id="create-new-task" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="outline" class="input-task">
+            <mat-label>Create new task</mat-label>
+            <input [(ngModel)]="textNewTask" name="text-new-task" matInput placeholder="What needs to be done?">
+        </mat-form-field>
+        <button class="create-button" color="primary" mat-raised-button>Create</button>
+    </form>
+    <mat-card class="list-item info-card">
+        <mat-checkbox (change)="changeStatusAllTask($event)">
+            <strong>Complete all task</strong>
+        </mat-checkbox>
+        <strong class="active-number">{{ counterActiveTasks }} items left</strong>
+    </mat-card>
+    
+    <app-to-do-item *ngFor="let item of tasksList.reverse()" [taskId]="item.id" [taskIsActive]="item.active" [taskText]="item.text"></app-to-do-item>
+
+    <mat-card class="list-item info-card">
+        <div class="container-button">
+            <button class="filter-button" [class.active]="filters.allFilter" mat-stroked-button (click)="showAllTasks()">All</button>
+            <button class="filter-button" [class.active]="filters.activeFilter" mat-stroked-button (click)="showActiveTasks()">Active</button>
+            <button class="filter-button" [class.active]="filters.completedFilter" mat-stroked-button (click)="showCompletedTasks()">Completed</button>
+        </div>
+        <button class="clear-button" mat-stroked-button (click)="clearCompletedTasks()">Clear completed</button>
+    </mat-card>
+</div>

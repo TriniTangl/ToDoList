@@ -1,0 +1,27 @@
+[
+    {
+        "id": 0,
+        "active": false,
+        "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    },
+    {
+        "id": 1,
+        "active": false,
+        "text": "Curabitur varius justo vitae mi condimentum semper."
+    },
+    {
+        "id": 2,
+        "active": true,
+        "text": "Nam finibus tellus nec lectus porta, sed lobortis felis cursus."
+    },
+    {
+        "id": 3,
+        "active": true,
+        "text": "Ut sed lacus eu ligula euismod fermentum sed in eros."
+    },
+    {
+        "id": 4,
+        "active": false,
+        "text": "Duis pellentesque ligula in sem tincidunt, vestibulum aliquam lectus fringilla."
+    }
+]

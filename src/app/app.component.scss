@@ -1,0 +1,61 @@
+.wrapper {
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 0 20px;
+
+    .input-task {
+        width: 100%;
+        height: 70px;
+    }
+
+    .create-button {
+        width: 100%;
+        margin-bottom: 20px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+
+    .list-item {
+        margin: 10px 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        &.info-card {
+            padding-top: 8px;
+            padding-bottom: 8px;
+
+            .container-button {
+                .filter-button {
+                    line-height: 28px;
+                    border-color: transparent;
+                    margin-right: 5px;
+
+                    &:last-child {
+                        margin-right: 0;
+                    }
+
+                    &.active {
+                        border-color: rgba(0,0,0,.12);
+                    }
+                }
+                
+                @media screen and (max-width: 484px){
+                    .filter-button {
+                        display: block;
+                        margin-right: 0;
+                        margin-bottom: 5px;
+
+                        &:last-child {
+                            margin-bottom: 0;
+                        }
+                    }
+                }
+            }
+
+            .clear-button {
+                line-height: 28px;
+            }
+        }
+    }
+}
