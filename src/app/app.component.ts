@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {LocalstorageService} from './services/localstorage.service';
 import {InitializationService} from './services/initialization.service';
-import {FilterStatus, ToDoItem} from './interfaces/basic';
+import {FilterStatus, StatusTask, ToDoItem} from './interfaces/basic';
 
 @Component({
     selector: 'app-root',
@@ -11,15 +11,17 @@ import {FilterStatus, ToDoItem} from './interfaces/basic';
 export class AppComponent implements OnInit {
 
     public tasksList: Array<ToDoItem>;
+    public filters: FilterStatus;
     public textNewTask: string;
     public counterActiveTasks: number;
-    public filters: FilterStatus;
+    public mainCheckboxStatus: boolean;
 
     constructor(
         private localstorageService: LocalstorageService,
         private initializationService: InitializationService) {
         this.tasksList = [];
         this.counterActiveTasks = 0;
+        this.mainCheckboxStatus = false;
         this.filters = {
             allFilter: true,
             activeFilter: false,
@@ -46,20 +48,25 @@ export class AppComponent implements OnInit {
     }
 
     onSubmit(): void {
-        const item: ToDoItem = {
-            id: new Date().getTime(),
-            active: false,
-            text: this.textNewTask
-        };
-        this.tasksList.push(item);
-        this.textNewTask = '';
-        this.updateLocalstorageData();
+        if (this.textNewTask) {
+            const item: ToDoItem = {
+                id: new Date().getTime(),
+                active: false,
+                text: this.textNewTask
+            };
+            this.showAllTasks();
+            this.tasksList.push(item);
+            this.textNewTask = '';
+            this.updateLocalstorageData();
+            this.updateMainCheckbox();
+        }
     }
 
     updateTasksListVariable(): void {
         if (Boolean(this.localstorageService.getData('TaskObject'))) {
             this.tasksList = JSON.parse(this.localstorageService.getData('TaskObject'));
             this.getCountActiveTasks();
+            this.updateMainCheckbox();
         }
     }
 
@@ -67,6 +74,11 @@ export class AppComponent implements OnInit {
         this.localstorageService.setData(
             'TaskObject',
             JSON.stringify(this.tasksList));
+        this.getCountActiveTasks();
+    }
+
+    updateMainCheckbox(): void {
+        this.mainCheckboxStatus = this.tasksList.every(item => item.active === true) && this.tasksList.length > 0;
     }
 
     getCountActiveTasks(): void {
@@ -91,6 +103,8 @@ export class AppComponent implements OnInit {
         temp = this.tasksList.filter(item => item.active === false);
         this.tasksList = temp;
         this.updateLocalstorageData();
+        this.showAllTasks();
+        this.updateMainCheckbox();
     }
 
     showAllTasks(): void {
@@ -124,5 +138,21 @@ export class AppComponent implements OnInit {
             activeFilter: false,
             completedFilter: true
         };
+    }
+
+    rememberStatusTask(task: StatusTask): void {
+        let index: number;
+        index = this.tasksList.findIndex(item => item.id === task.id);
+        this.tasksList[index].active = task.status;
+        this.updateLocalstorageData();
+        this.updateMainCheckbox();
+    }
+
+    removeTask(id: number): void {
+        let index: number;
+        index = this.tasksList.findIndex(item => item.id === id);
+        this.tasksList.splice(index, 1);
+        this.updateLocalstorageData();
+        this.updateMainCheckbox();
     }
 }

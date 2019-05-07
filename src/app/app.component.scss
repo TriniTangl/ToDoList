@@ -16,10 +16,10 @@
     }
 
     .list-item {
-        margin: 10px 0;
         display: flex;
         align-items: center;
         justify-content: space-between;
+        margin: 10px 0;
 
         &.info-card {
             padding-top: 8px;
@@ -27,20 +27,20 @@
 
             .container-button {
                 .filter-button {
+                    margin-right: 5px;
                     line-height: 28px;
                     border-color: transparent;
-                    margin-right: 5px;
 
                     &:last-child {
                         margin-right: 0;
                     }
 
                     &.active {
-                        border-color: rgba(0,0,0,.12);
+                        border-color: rgba(0, 0, 0, .12);
                     }
                 }
-                
-                @media screen and (max-width: 484px){
+
+                @media screen and (max-width: 484px) {
                     .filter-button {
                         display: block;
                         margin-right: 0;

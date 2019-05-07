@@ -1,4 +1,5 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {StatusTask} from '../interfaces/basic';
 
 @Component({
     selector: 'app-to-do-item',
@@ -11,6 +12,9 @@ export class ToDoItemComponent implements OnInit {
     @Input() taskIsActive: boolean;
     @Input() taskText: string;
 
+    @Output() getStatusTaskEmitter = new EventEmitter<StatusTask>();
+    @Output() removeTaskEmitter = new EventEmitter<number>();
+
     constructor() {
     }
 
@@ -18,6 +22,16 @@ export class ToDoItemComponent implements OnInit {
     }
 
     changeStatusTask(): void {
+        let temp: StatusTask;
         this.taskIsActive = !this.taskIsActive;
+        temp = {
+            id: this.taskId,
+            status: this.taskIsActive
+        };
+        this.getStatusTaskEmitter.emit(temp);
+    }
+
+    removeTask(): void {
+        this.removeTaskEmitter.emit(this.taskId);
     }
 }

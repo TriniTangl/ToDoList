@@ -9,3 +9,8 @@ export interface FilterStatus {
     activeFilter: boolean;
     completedFilter: boolean;
 }
+
+export interface StatusTask {
+    id: number;
+    status: boolean;
+}
