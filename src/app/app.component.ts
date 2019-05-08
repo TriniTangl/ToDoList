@@ -95,6 +95,7 @@ export class AppComponent implements OnInit {
         this.tasksList.forEach(item => {
             item.active = event.checked;
         });
+        this.updateMainCheckbox();
         this.updateLocalstorageData();
     }
 
