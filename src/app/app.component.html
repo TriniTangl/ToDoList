@@ -13,19 +13,19 @@
         <strong class="active-number">{{ counterActiveTasks }} items left</strong>
     </mat-card>
     
-    <app-to-do-item (getStatusTaskEmitter)="rememberStatusTask($event)" (removeTaskEmitter)="removeTask($event)"
-                    *ngFor="let item of tasksList.reverse()" [taskId]="item.id"
+    <app-to-do-item (changeStatusTaskEmitter)="changeStatusTask($event)" (removeTaskEmitter)="removeTask($event)"
+                    (editTaskTextEmitter)="editTaskText($event)" *ngFor="let item of tasksList.reverse()" [taskId]="item.id"
                     [taskIsActive]="item.active" [taskText]="item.text"></app-to-do-item>
     
     <mat-card class="list-item info-card">
         <div class="container-button">
-            <button (click)="showAllTasks()" [class.active]="filters.allFilter" class="filter-button"
+            <button (click)="taskFiltration('all')" [class.active]="filters.allFilter" class="filter-button"
                     mat-stroked-button>All
             </button>
-            <button (click)="showActiveTasks()" [class.active]="filters.activeFilter" class="filter-button"
+            <button (click)="taskFiltration('active', false)" [class.active]="filters.activeFilter" class="filter-button"
                     mat-stroked-button>Active
             </button>
-            <button (click)="showCompletedTasks()" [class.active]="filters.completedFilter" class="filter-button"
+            <button (click)="taskFiltration('completed', true)" [class.active]="filters.completedFilter" class="filter-button"
                     mat-stroked-button>Completed
             </button>
         </div>

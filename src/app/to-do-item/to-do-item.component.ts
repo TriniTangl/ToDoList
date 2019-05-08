@@ -1,5 +1,5 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {StatusTask} from '../interfaces/basic';
+import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {ToDoItem} from '../interfaces/basic';
 
 @Component({
     selector: 'app-to-do-item',
@@ -12,26 +12,49 @@ export class ToDoItemComponent implements OnInit {
     @Input() taskIsActive: boolean;
     @Input() taskText: string;
 
-    @Output() getStatusTaskEmitter = new EventEmitter<StatusTask>();
+    @Output() changeStatusTaskEmitter = new EventEmitter<ToDoItem>();
+    @Output() editTaskTextEmitter = new EventEmitter<ToDoItem>();
     @Output() removeTaskEmitter = new EventEmitter<number>();
 
+    public editStatus: boolean;
+
+    @ViewChild('editInput') editInput: ElementRef;
+
     constructor() {
+        this.editStatus = false;
     }
 
     ngOnInit() {
     }
 
     changeStatusTask(): void {
-        let temp: StatusTask;
+        let temp: ToDoItem;
         this.taskIsActive = !this.taskIsActive;
         temp = {
             id: this.taskId,
-            status: this.taskIsActive
+            active: this.taskIsActive
         };
-        this.getStatusTaskEmitter.emit(temp);
+        this.changeStatusTaskEmitter.emit(temp);
     }
 
     removeTask(): void {
         this.removeTaskEmitter.emit(this.taskId);
+    }
+
+    editTaskText(): void {
+        this.editStatus = !this.editStatus;
+        setTimeout(() => { // this will make the execution after the above boolean has changed
+            this.editInput.nativeElement.focus();
+        }, 0);
+    }
+
+    saveEditTaskText(): void {
+        let temp: ToDoItem;
+        this.editStatus = !this.editStatus;
+        temp = {
+            id: this.taskId,
+            text: this.taskText
+        };
+        this.editTaskTextEmitter.emit(temp);
     }
 }

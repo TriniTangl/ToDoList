@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {LocalstorageService} from './services/localstorage.service';
 import {InitializationService} from './services/initialization.service';
-import {FilterStatus, StatusTask, ToDoItem} from './interfaces/basic';
+import {FilterStatus, ToDoItem} from './interfaces/basic';
 
 @Component({
     selector: 'app-root',
@@ -54,7 +54,7 @@ export class AppComponent implements OnInit {
                 active: false,
                 text: this.textNewTask
             };
-            this.showAllTasks();
+            this.taskFiltration('all');
             this.tasksList.push(item);
             this.textNewTask = '';
             this.updateLocalstorageData();
@@ -83,76 +83,83 @@ export class AppComponent implements OnInit {
 
     getCountActiveTasks(): void {
         this.counterActiveTasks = 0;
-        for (const item of this.tasksList) {
+        this.tasksList.forEach(item => {
             if (item.active === false) {
                 this.counterActiveTasks++;
             }
-        }
+        });
     }
 
     changeStatusAllTask(event): void {
-        for (const item of this.tasksList) {
+        this.taskFiltration('all');
+        this.tasksList.forEach(item => {
             item.active = event.checked;
-        }
+        });
         this.updateLocalstorageData();
     }
 
     clearCompletedTasks(): void {
-        let temp: any;
-        this.updateTasksListVariable();
-        temp = this.tasksList.filter(item => item.active === false);
-        this.tasksList = temp;
+        this.taskFiltration('active', false);
         this.updateLocalstorageData();
-        this.showAllTasks();
+        this.taskFiltration('all');
         this.updateMainCheckbox();
     }
 
-    showAllTasks(): void {
-        this.updateTasksListVariable();
-        this.filters = {
-            allFilter: true,
-            activeFilter: false,
-            completedFilter: false
-        };
-    }
-
-    showActiveTasks(): void {
+    taskFiltration(type: string, subject?: boolean) {
         let temp: any;
         this.updateTasksListVariable();
-        temp = this.tasksList.filter(item => item.active === false);
-        this.tasksList = temp;
-        this.filters = {
-            allFilter: false,
-            activeFilter: true,
-            completedFilter: false
-        };
-    }
-
-    showCompletedTasks(): void {
-        let temp: any;
-        this.updateTasksListVariable();
-        temp = this.tasksList.filter(item => item.active === true);
-        this.tasksList = temp;
         this.filters = {
             allFilter: false,
             activeFilter: false,
-            completedFilter: true
+            completedFilter: false
         };
+        switch (type) {
+            case 'all': {
+                this.filters.allFilter = true;
+                break;
+            }
+            case 'active': case 'completed': {
+                temp = this.tasksList.filter(item => item.active === subject);
+                this.tasksList = temp;
+                switch (type) {
+                    case 'active': {
+                        this.filters.activeFilter = true;
+                        break;
+                    }
+                    case 'completed': {
+                        this.filters.completedFilter = true;
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
+                }
+                break;
+            }
+            default: {
+                break;
+            }
+        }
     }
 
-    rememberStatusTask(task: StatusTask): void {
-        let index: number;
-        index = this.tasksList.findIndex(item => item.id === task.id);
-        this.tasksList[index].active = task.status;
+    changeStatusTask(task: ToDoItem): void {
+        this.tasksList[this.findIndexTask(task.id)].active = task.active;
         this.updateLocalstorageData();
         this.updateMainCheckbox();
+    }
+
+    editTaskText(task: ToDoItem): void {
+        this.tasksList[this.findIndexTask(task.id)].text = task.text;
+        this.updateLocalstorageData();
     }
 
     removeTask(id: number): void {
-        let index: number;
-        index = this.tasksList.findIndex(item => item.id === id);
-        this.tasksList.splice(index, 1);
+        this.tasksList.splice(this.findIndexTask(id), 1);
         this.updateLocalstorageData();
         this.updateMainCheckbox();
+    }
+
+    findIndexTask(id: number): number {
+        return  this.tasksList.findIndex(item => item.id === id);
     }
 }
