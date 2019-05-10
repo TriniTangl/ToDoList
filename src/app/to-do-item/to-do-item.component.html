@@ -1,5 +1,5 @@
 <mat-card class="list-item">
-    <mat-checkbox (change)="changeStatusTask()" [ngModel]="taskIsActive"></mat-checkbox>
+    <mat-checkbox (change)="changeTaskStatus()" [ngModel]="taskIsActive"></mat-checkbox>
     
     <span *ngIf="!editStatus" [ngClass]="{completed: taskIsActive}" class="text-item">{{ taskText }}</span>
     

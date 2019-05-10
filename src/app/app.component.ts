@@ -1,7 +1,8 @@
 import {Component, OnInit} from '@angular/core';
-import {LocalstorageService} from './services/localstorage.service';
+import {LocalStorageService} from './services/local-storage.service';
 import {InitializationService} from './services/initialization.service';
 import {FilterStatus, ToDoItem, ToDoItemTransfer} from './interfaces/basic';
+import {MatCheckboxChange} from '@angular/material';
 
 @Component({
     selector: 'app-root',
@@ -13,33 +14,33 @@ export class AppComponent implements OnInit {
     public taskList: Array<ToDoItem>;
     public renderList: Array<ToDoItem>;
     public filters: FilterStatus;
-    public textNewTask: string;
-    public counterActiveTasks: number;
+    public newTaskText: string;
+    public activeTasksCounter: number;
     public mainCheckboxStatus: boolean;
 
     constructor(private initializationService: InitializationService) {
         this.taskList = [];
         this.renderList = this.taskList;
-        this.counterActiveTasks = 0;
+        this.activeTasksCounter = 0;
         this.mainCheckboxStatus = false;
-        this.textNewTask = '';
+        this.newTaskText = '';
         this.filters = {
-            allFilter: true,
-            activeFilter: false,
-            completedFilter: false
+            all: true,
+            active: false,
+            completed: false
         };
     }
 
     ngOnInit(): void {
-        if (LocalstorageService.checkData('TasksDB') === false) {
+        if (LocalStorageService.checkData('TasksDB') === false) {
             this.initializationService.getInitialTasksList()
                 .subscribe(
                     (data: ToDoItem) => {
-                        LocalstorageService.setData('TasksDB', data);
+                        LocalStorageService.setData('TasksDB', data);
                         this.updateTasksList();
                         this.updateRenderList();
                     },
-                    (error: any) => {
+                    (error: Error) => {
                         console.log(error);
                     }
                 );
@@ -49,41 +50,41 @@ export class AppComponent implements OnInit {
     }
 
     createNewTask(): void {
-        if (this.textNewTask.length > 0) {
+        if (this.newTaskText.length > 0) {
             const item: ToDoItem = {
                 id: new Date().getTime(),
                 active: false,
-                text: this.textNewTask
+                text: this.newTaskText
             };
             this.taskList.push(item);
-            this.textNewTask = '';
+            this.newTaskText = '';
             this.updateLocalstorageData();
             this.updateRenderList();
         }
     }
 
     updateTasksList(): void {
-        if (LocalstorageService.checkData('TasksDB')) {
-            this.taskList = LocalstorageService.getData('TasksDB');
+        if (LocalStorageService.checkData('TasksDB')) {
+            this.taskList = LocalStorageService.getData('TasksDB');
             this.getCountActiveTasks();
             this.updateMainCheckbox();
         }
     }
 
     updateRenderList(): void {
-        if (this.filters.activeFilter) {
-            this.taskFiltration('active', false);
-        } else if (this.filters.completedFilter) {
-            this.taskFiltration('completed', true);
+        if (this.filters.active) {
+            this.filterTasks('active');
+        } else if (this.filters.completed) {
+            this.filterTasks('completed');
         } else {
-            this.taskFiltration('all');
+            this.filterTasks('all');
         }
         this.getCountActiveTasks();
         this.updateMainCheckbox();
     }
 
     updateLocalstorageData(): void {
-        LocalstorageService.setData('TasksDB', this.taskList);
+        LocalStorageService.setData('TasksDB', this.taskList);
     }
 
     updateMainCheckbox(): void {
@@ -91,34 +92,34 @@ export class AppComponent implements OnInit {
     }
 
     getCountActiveTasks(): void {
-        this.counterActiveTasks = 0;
+        this.activeTasksCounter = 0;
         this.taskList.forEach(item => {
             if (item.active === false) {
-                this.counterActiveTasks++;
+                this.activeTasksCounter++;
             }
         });
     }
 
-    taskFiltration(type: string, subject?: boolean): void {
+    filterTasks(type: string): void {
         this.filters = {
-            allFilter: false,
-            activeFilter: false,
-            completedFilter: false
+            all: false,
+            active: false,
+            completed: false
         };
         switch (type) {
             case 'all': {
                 this.renderList = this.taskList;
-                this.filters.allFilter = true;
+                this.filters.all = true;
                 break;
             }
             case 'active': {
-                this.renderList = this.taskList.filter(item => item.active === subject);
-                this.filters.activeFilter = true;
+                this.renderList = this.taskList.filter(item => item.active === false );
+                this.filters.active = true;
                 break;
             }
             case 'completed': {
-                this.renderList = this.taskList.filter(item => item.active === subject);
-                this.filters.completedFilter = true;
+                this.renderList = this.taskList.filter(item => item.active === true );
+                this.filters.completed = true;
                 break;
             }
             default: {
@@ -127,39 +128,37 @@ export class AppComponent implements OnInit {
         }
     }
 
-    changeStatusAllTask(event: any): void {
+    changeAllTasksStatus(event: MatCheckboxChange): void {
         this.taskList.forEach(item => item.active = event.checked);
         this.updateLocalstorageData();
         this.updateRenderList();
     }
 
     clearCompletedTasks(): void {
-        let temp: Array<ToDoItem>;
-        temp = this.taskList.filter(item => item.active === false);
-        this.taskList = temp;
+        this.taskList = this.taskList.filter(item => item.active === false);
         this.updateLocalstorageData();
         this.updateRenderList();
     }
 
-    changeStatusTask(task: ToDoItemTransfer): void {
-        this.taskList[this.findIndexTask(task.id)].active = task.active;
+    changeTaskStatus(task: ToDoItemTransfer): void {
+        this.taskList[this.findTaskIndex(task.id)].active = task.active;
         this.updateLocalstorageData();
         this.updateRenderList();
     }
 
     editTaskText(task: ToDoItemTransfer): void {
-        this.taskList[this.findIndexTask(task.id)].text = task.text;
+        this.taskList[this.findTaskIndex(task.id)].text = task.text;
         this.updateLocalstorageData();
         this.updateRenderList();
     }
 
     removeTask(id: number): void {
-        this.taskList.splice(this.findIndexTask(id), 1);
+        this.taskList.splice(this.findTaskIndex(id), 1);
         this.updateLocalstorageData();
         this.updateRenderList();
     }
 
-    findIndexTask(id: number): number {
+    findTaskIndex(id: number): number {
         return this.taskList.findIndex(item => item.id === id);
     }
 }

@@ -12,7 +12,7 @@ export class ToDoItemComponent implements OnInit {
     @Input() taskIsActive: boolean;
     @Input() taskText: string;
 
-    @Output() changeStatusTaskEmitter = new EventEmitter<ToDoItemTransfer>();
+    @Output() changeTaskStatusEmitter = new EventEmitter<ToDoItemTransfer>();
     @Output() editTaskTextEmitter = new EventEmitter<ToDoItemTransfer>();
     @Output() removeTaskEmitter = new EventEmitter<number>();
 
@@ -27,14 +27,14 @@ export class ToDoItemComponent implements OnInit {
     ngOnInit() {
     }
 
-    changeStatusTask(): void {
+    changeTaskStatus(): void {
         let temp: ToDoItemTransfer;
         this.taskIsActive = !this.taskIsActive;
         temp = {
             id: this.taskId,
             active: this.taskIsActive
         };
-        this.changeStatusTaskEmitter.emit(temp);
+        this.changeTaskStatusEmitter.emit(temp);
     }
 
     removeTask(): void {

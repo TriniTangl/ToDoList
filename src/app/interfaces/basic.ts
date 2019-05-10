@@ -11,7 +11,7 @@ export interface ToDoItemTransfer {
 }
 
 export interface FilterStatus {
-    allFilter: boolean;
-    activeFilter: boolean;
-    completedFilter: boolean;
+    all: boolean;
+    active: boolean;
+    completed: boolean;
 }
