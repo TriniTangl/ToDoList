@@ -1,34 +1,43 @@
 <div class="wrapper">
-    <form (ngSubmit)="onSubmit()" id="create-new-task">
+    
+    <form (ngSubmit)="createNewTask()" id="create-new-task">
         <mat-form-field appearance="outline" class="input-task">
             <mat-label>Create new task</mat-label>
             <input [(ngModel)]="textNewTask" matInput name="text-new-task" placeholder="What needs to be done?">
         </mat-form-field>
+        
         <button class="create-button" color="primary" mat-raised-button>Create</button>
     </form>
+    
     <mat-card class="list-item info-card">
         <mat-checkbox (change)="changeStatusAllTask($event)" [(ngModel)]="mainCheckboxStatus">
             <strong>Complete all task</strong>
         </mat-checkbox>
+        
         <strong class="active-number">{{ counterActiveTasks }} items left</strong>
     </mat-card>
     
-    <app-to-do-item (changeStatusTaskEmitter)="changeStatusTask($event)" (removeTaskEmitter)="removeTask($event)"
-                    (editTaskTextEmitter)="editTaskText($event)" *ngFor="let item of tasksList.reverse()" [taskId]="item.id"
-                    [taskIsActive]="item.active" [taskText]="item.text"></app-to-do-item>
+    <app-to-do-item (changeStatusTaskEmitter)="changeStatusTask($event)" (editTaskTextEmitter)="editTaskText($event)"
+                    (removeTaskEmitter)="removeTask($event)" *ngFor="let item of renderList.reverse()"
+                    [taskId]="item.id" [taskIsActive]="item.active" [taskText]="item.text"></app-to-do-item>
     
     <mat-card class="list-item info-card">
         <div class="container-button">
             <button (click)="taskFiltration('all')" [class.active]="filters.allFilter" class="filter-button"
                     mat-stroked-button>All
             </button>
-            <button (click)="taskFiltration('active', false)" [class.active]="filters.activeFilter" class="filter-button"
+            
+            <button (click)="taskFiltration('active', false)" [class.active]="filters.activeFilter"
+                    class="filter-button"
                     mat-stroked-button>Active
             </button>
-            <button (click)="taskFiltration('completed', true)" [class.active]="filters.completedFilter" class="filter-button"
+            
+            <button (click)="taskFiltration('completed', true)" [class.active]="filters.completedFilter"
+                    class="filter-button"
                     mat-stroked-button>Completed
             </button>
         </div>
+        
         <button (click)="clearCompletedTasks()" class="clear-button" mat-stroked-button>Clear completed</button>
     </mat-card>
 </div>

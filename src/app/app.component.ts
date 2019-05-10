@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {LocalstorageService} from './services/localstorage.service';
 import {InitializationService} from './services/initialization.service';
-import {FilterStatus, ToDoItem} from './interfaces/basic';
+import {FilterStatus, ToDoItem, ToDoItemTransfer} from './interfaces/basic';
 
 @Component({
     selector: 'app-root',
@@ -10,16 +10,16 @@ import {FilterStatus, ToDoItem} from './interfaces/basic';
 })
 export class AppComponent implements OnInit {
 
-    public tasksList: Array<ToDoItem>;
+    public taskList: Array<ToDoItem>;
+    public renderList: Array<ToDoItem>;
     public filters: FilterStatus;
     public textNewTask: string;
     public counterActiveTasks: number;
     public mainCheckboxStatus: boolean;
 
-    constructor(
-        private localstorageService: LocalstorageService,
-        private initializationService: InitializationService) {
-        this.tasksList = [];
+    constructor(private initializationService: InitializationService) {
+        this.taskList = [];
+        this.renderList = this.taskList;
         this.counterActiveTasks = 0;
         this.mainCheckboxStatus = false;
         this.filters = {
@@ -30,85 +30,75 @@ export class AppComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        if (Boolean(this.localstorageService.getData('TaskObject')) === false) {
+        if (LocalstorageService.checkData('TasksDB') === false) {
             this.initializationService.getInitialTasksList()
                 .subscribe(
                     (data: ToDoItem) => {
-                        this.localstorageService.setData(
-                            'TaskObject',
-                            JSON.stringify(data));
-                        this.updateTasksListVariable();
+                        LocalstorageService.setData('TasksDB', data);
+                        this.updateTasksList();
+                        this.updateRenderList();
                     },
                     (error: any) => {
                         console.log(error);
                     }
                 );
         }
-        this.updateTasksListVariable();
+        this.updateTasksList();
+        this.updateRenderList();
     }
 
-    onSubmit(): void {
-        if (this.textNewTask) {
+    createNewTask(): void {
+        if (this.textNewTask.length > 0) {
             const item: ToDoItem = {
                 id: new Date().getTime(),
                 active: false,
                 text: this.textNewTask
             };
-            this.taskFiltration('all');
-            this.tasksList.push(item);
+            this.taskList.push(item);
             this.textNewTask = '';
             this.updateLocalstorageData();
-            this.updateMainCheckbox();
+            this.updateRenderList();
         }
     }
 
-    updateTasksListVariable(): void {
-        if (Boolean(this.localstorageService.getData('TaskObject'))) {
-            this.tasksList = JSON.parse(this.localstorageService.getData('TaskObject'));
+    updateTasksList(): void {
+        if (LocalstorageService.checkData('TasksDB')) {
+            this.taskList = LocalstorageService.getData('TasksDB');
             this.getCountActiveTasks();
             this.updateMainCheckbox();
         }
     }
 
-    updateLocalstorageData(): void {
-        this.localstorageService.setData(
-            'TaskObject',
-            JSON.stringify(this.tasksList));
+    updateRenderList(): void {
+        if (this.filters.activeFilter) {
+            this.taskFiltration('active', false);
+        } else if (this.filters.completedFilter) {
+            this.taskFiltration('completed', true);
+        } else {
+            this.taskFiltration('all');
+        }
         this.getCountActiveTasks();
+        this.updateMainCheckbox();
+    }
+
+    updateLocalstorageData(): void {
+        LocalstorageService.setData('TasksDB', this.taskList);
     }
 
     updateMainCheckbox(): void {
-        this.mainCheckboxStatus = this.tasksList.every(item => item.active === true) && this.tasksList.length > 0;
+        this.mainCheckboxStatus = this.taskList.every(item => item.active === true) && this.taskList.length > 0;
     }
 
     getCountActiveTasks(): void {
         this.counterActiveTasks = 0;
-        this.tasksList.forEach(item => {
+        this.taskList.forEach(item => {
             if (item.active === false) {
                 this.counterActiveTasks++;
             }
         });
     }
 
-    changeStatusAllTask(event): void {
-        this.taskFiltration('all');
-        this.tasksList.forEach(item => {
-            item.active = event.checked;
-        });
-        this.updateMainCheckbox();
-        this.updateLocalstorageData();
-    }
-
-    clearCompletedTasks(): void {
-        this.taskFiltration('active', false);
-        this.updateLocalstorageData();
-        this.taskFiltration('all');
-        this.updateMainCheckbox();
-    }
-
-    taskFiltration(type: string, subject?: boolean) {
-        let temp: any;
-        this.updateTasksListVariable();
+    taskFiltration(type: string, subject?: boolean): void {
         this.filters = {
             allFilter: false,
             activeFilter: false,
@@ -116,25 +106,18 @@ export class AppComponent implements OnInit {
         };
         switch (type) {
             case 'all': {
+                this.renderList = this.taskList;
                 this.filters.allFilter = true;
                 break;
             }
-            case 'active': case 'completed': {
-                temp = this.tasksList.filter(item => item.active === subject);
-                this.tasksList = temp;
-                switch (type) {
-                    case 'active': {
-                        this.filters.activeFilter = true;
-                        break;
-                    }
-                    case 'completed': {
-                        this.filters.completedFilter = true;
-                        break;
-                    }
-                    default: {
-                        break;
-                    }
-                }
+            case 'active': {
+                this.renderList = this.taskList.filter(item => item.active === subject);
+                this.filters.activeFilter = true;
+                break;
+            }
+            case 'completed': {
+                this.renderList = this.taskList.filter(item => item.active === subject);
+                this.filters.completedFilter = true;
                 break;
             }
             default: {
@@ -143,24 +126,39 @@ export class AppComponent implements OnInit {
         }
     }
 
-    changeStatusTask(task: ToDoItem): void {
-        this.tasksList[this.findIndexTask(task.id)].active = task.active;
+    changeStatusAllTask(event: any): void {
+        this.taskList.forEach(item => item.active = event.checked);
         this.updateLocalstorageData();
-        this.updateMainCheckbox();
+        this.updateRenderList();
     }
 
-    editTaskText(task: ToDoItem): void {
-        this.tasksList[this.findIndexTask(task.id)].text = task.text;
+    clearCompletedTasks(): void {
+        let temp: Array<ToDoItem>;
+        temp = this.taskList.filter(item => item.active === false);
+        this.taskList = temp;
         this.updateLocalstorageData();
+        this.updateRenderList();
+    }
+
+    changeStatusTask(task: ToDoItemTransfer): void {
+        this.taskList[this.findIndexTask(task.id)].active = task.active;
+        this.updateLocalstorageData();
+        this.updateRenderList();
+    }
+
+    editTaskText(task: ToDoItemTransfer): void {
+        this.taskList[this.findIndexTask(task.id)].text = task.text;
+        this.updateLocalstorageData();
+        this.updateRenderList();
     }
 
     removeTask(id: number): void {
-        this.tasksList.splice(this.findIndexTask(id), 1);
+        this.taskList.splice(this.findIndexTask(id), 1);
         this.updateLocalstorageData();
-        this.updateMainCheckbox();
+        this.updateRenderList();
     }
 
     findIndexTask(id: number): number {
-        return  this.tasksList.findIndex(item => item.id === id);
+        return this.taskList.findIndex(item => item.id === id);
     }
 }

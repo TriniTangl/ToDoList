@@ -8,10 +8,9 @@ export class InitializationService {
 
     private dataLink: string = './assets/api/tasks.json';
 
-    constructor(private http: HttpClient) {
-    }
+    constructor(private http: HttpClient) { }
 
-    getInitialTasksList() {
+    getInitialTasksList(): any {
         return this.http.get(this.dataLink, {});
     }
 }
