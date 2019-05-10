@@ -22,6 +22,7 @@ export class AppComponent implements OnInit {
         this.renderList = this.taskList;
         this.counterActiveTasks = 0;
         this.mainCheckboxStatus = false;
+        this.textNewTask = '';
         this.filters = {
             allFilter: true,
             activeFilter: false,
