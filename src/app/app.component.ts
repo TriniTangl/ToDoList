@@ -50,6 +50,10 @@ export class AppComponent implements OnInit {
         this.updateRenderList();
     }
 
+    get activeTasksCount(): number {
+        return this.taskList.filter(item => item.active === false).length;
+    }
+
     createNewTask(): void {
         if (this.newTaskText.length > 0) {
             const item: ToDoItem = {
@@ -67,7 +71,6 @@ export class AppComponent implements OnInit {
     updateTasksList(): void {
         if (LocalStorageService.checkData('TasksDB')) {
             this.taskList = LocalStorageService.getData('TasksDB');
-            this.getCountActiveTasks();
             this.updateMainCheckbox();
         }
     }
@@ -80,7 +83,6 @@ export class AppComponent implements OnInit {
         } else {
             this.filterTasks('all');
         }
-        this.getCountActiveTasks();
         this.updateMainCheckbox();
     }
 
@@ -90,15 +92,6 @@ export class AppComponent implements OnInit {
 
     updateMainCheckbox(): void {
         this.mainCheckboxStatus = this.taskList.every(item => item.active === true) && this.taskList.length > 0;
-    }
-
-    getCountActiveTasks(): void {
-        this.activeTasksCounter = 0;
-        this.taskList.forEach(item => {
-            if (item.active === false) {
-                this.activeTasksCounter++;
-            }
-        });
     }
 
     filterTasks(type: string): void {

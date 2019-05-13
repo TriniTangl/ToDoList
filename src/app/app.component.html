@@ -14,7 +14,7 @@
             <strong>Complete all task</strong>
         </mat-checkbox>
         
-        <strong class="active-number">{{ activeTasksCounter }} items left</strong>
+        <strong class="active-number">{{ activeTasksCount }} items left</strong>
     </mat-card>
     
     <app-to-do-item (changeTaskEmitter)="changeTask($event)" (removeTaskEmitter)="removeTask($event)"
