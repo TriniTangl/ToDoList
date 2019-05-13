@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {LocalStorageService} from './services/local-storage.service';
 import {InitializationService} from './services/initialization.service';
-import {FilterStatus, ToDoItem, ToDoItemTransfer} from './interfaces/basic';
+import {ErrorResponse, FilterStatus, ToDoItem, ToDoItemTransfer} from './interfaces/basic';
 import {MatCheckboxChange} from '@angular/material';
 
 @Component({
@@ -40,7 +40,8 @@ export class AppComponent implements OnInit {
                         this.updateTasksList();
                         this.updateRenderList();
                     },
-                    (error: Error) => {
+                    (error: ErrorResponse) => {
+                        alert(`Status: ${error.status}\nMessage: ${error.message}`);
                         console.log(error);
                     }
                 );
@@ -113,12 +114,12 @@ export class AppComponent implements OnInit {
                 break;
             }
             case 'active': {
-                this.renderList = this.taskList.filter(item => item.active === false );
+                this.renderList = this.taskList.filter(item => item.active === false);
                 this.filters.active = true;
                 break;
             }
             case 'completed': {
-                this.renderList = this.taskList.filter(item => item.active === true );
+                this.renderList = this.taskList.filter(item => item.active === true);
                 this.filters.completed = true;
                 break;
             }

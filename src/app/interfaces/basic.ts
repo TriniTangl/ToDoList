@@ -15,3 +15,8 @@ export interface FilterStatus {
     active: boolean;
     completed: boolean;
 }
+
+export interface ErrorResponse {
+    status: number;
+    message: string;
+}
