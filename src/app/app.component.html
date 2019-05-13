@@ -17,9 +17,8 @@
         <strong class="active-number">{{ activeTasksCounter }} items left</strong>
     </mat-card>
     
-    <app-to-do-item (changeTaskStatusEmitter)="changeTaskStatus($event)" (editTaskTextEmitter)="editTaskText($event)"
-                    (removeTaskEmitter)="removeTask($event)" *ngFor="let item of renderList.reverse()"
-                    [taskId]="item.id" [taskIsActive]="item.active" [taskText]="item.text"></app-to-do-item>
+    <app-to-do-item (changeTaskEmitter)="changeTask($event)" (removeTaskEmitter)="removeTask($event)"
+                    *ngFor="let item of renderList.reverse()" [task]="item"></app-to-do-item>
     
     <mat-card class="list-item info-card">
         <div class="container-button">

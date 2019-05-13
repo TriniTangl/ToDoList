@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {LocalStorageService} from './services/local-storage.service';
 import {InitializationService} from './services/initialization.service';
-import {ErrorResponse, FilterStatus, ToDoItem, ToDoItemTransfer} from './interfaces/basic';
+import {ErrorResponse, FilterStatus, ToDoItem} from './interfaces/basic';
 import {MatCheckboxChange} from '@angular/material';
 
 @Component({
@@ -141,14 +141,10 @@ export class AppComponent implements OnInit {
         this.updateRenderList();
     }
 
-    changeTaskStatus(task: ToDoItemTransfer): void {
-        this.taskList[this.findTaskIndex(task.id)].active = task.active;
-        this.updateLocalstorageData();
-        this.updateRenderList();
-    }
-
-    editTaskText(task: ToDoItemTransfer): void {
-        this.taskList[this.findTaskIndex(task.id)].text = task.text;
+    changeTask(task: ToDoItem): void {
+        const index: number = this.findTaskIndex(task.id);
+        this.taskList[index].active = task.active;
+        this.taskList[index].text = task.text;
         this.updateLocalstorageData();
         this.updateRenderList();
     }

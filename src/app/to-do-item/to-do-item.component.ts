@@ -1,5 +1,5 @@
 import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
-import {ToDoItemTransfer} from '../interfaces/basic';
+import {ToDoItem} from '../interfaces/basic';
 
 @Component({
     selector: 'app-to-do-item',
@@ -8,12 +8,9 @@ import {ToDoItemTransfer} from '../interfaces/basic';
 })
 export class ToDoItemComponent implements OnInit {
 
-    @Input() taskId: number;
-    @Input() taskIsActive: boolean;
-    @Input() taskText: string;
+    @Input() task: ToDoItem;
 
-    @Output() changeTaskStatusEmitter = new EventEmitter<ToDoItemTransfer>();
-    @Output() editTaskTextEmitter = new EventEmitter<ToDoItemTransfer>();
+    @Output() changeTaskEmitter = new EventEmitter<ToDoItem>();
     @Output() removeTaskEmitter = new EventEmitter<number>();
 
     @ViewChild('editInput') editInput: ElementRef;
@@ -27,34 +24,35 @@ export class ToDoItemComponent implements OnInit {
     ngOnInit() {
     }
 
-    changeTaskStatus(): void {
-        let temp: ToDoItemTransfer;
-        this.taskIsActive = !this.taskIsActive;
-        temp = {
-            id: this.taskId,
-            active: this.taskIsActive
-        };
-        this.changeTaskStatusEmitter.emit(temp);
+    changeTask(action: string): void {
+        switch (action) {
+            case 'editText': {
+                this.editStatus = !this.editStatus;
+                break;
+            }
+            case 'changeStatus': {
+                this.task.active = !this.task.active;
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+        this.changeTaskEmitter.emit({
+            id: this.task.id,
+            active: this.task.active,
+            text: this.task.text
+        });
     }
 
     removeTask(): void {
-        this.removeTaskEmitter.emit(this.taskId);
+        this.removeTaskEmitter.emit(this.task.id);
     }
 
-    editTaskText(): void {
+    startEditingTask(): void {
         this.editStatus = !this.editStatus;
         setTimeout(() => { // this will make the execution after the above boolean has changed ¯\_(ツ)_/¯
             this.editInput.nativeElement.focus();
         }, 0);
-    }
-
-    saveEditTaskText(): void {
-        let temp: ToDoItemTransfer;
-        this.editStatus = !this.editStatus;
-        temp = {
-            id: this.taskId,
-            text: this.taskText
-        };
-        this.editTaskTextEmitter.emit(temp);
     }
 }

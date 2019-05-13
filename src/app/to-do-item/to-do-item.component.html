@@ -1,18 +1,18 @@
 <mat-card class="list-item">
-    <mat-checkbox (change)="changeTaskStatus()" [ngModel]="taskIsActive"></mat-checkbox>
+    <mat-checkbox (change)="changeTask('changeStatus')" [ngModel]="task.active"></mat-checkbox>
     
-    <span *ngIf="!editStatus" [ngClass]="{completed: taskIsActive}" class="text-item">{{ taskText }}</span>
+    <span *ngIf="!editStatus" [ngClass]="{completed: task.active}" class="text-item">{{ task.text }}</span>
     
     <mat-form-field *ngIf="editStatus" class="text-item">
-        <input #editInput (blur)="saveEditTaskText()" [(ngModel)]="taskText" matInput placeholder="Edit task">
+        <input #editInput (blur)="changeTask('editText')" [(ngModel)]="task.text" matInput placeholder="Edit task">
     </mat-form-field>
     
     <span class="container-button">
-            <button (click)="editTaskText()" *ngIf="!editStatus" class="control-button" color="primary" mat-icon-button>
+            <button (click)="startEditingTask()" *ngIf="!editStatus" class="control-button" color="primary" mat-icon-button>
                 <mat-icon>create</mat-icon>
             </button>
         
-            <button (click)="saveEditTaskText()" *ngIf="editStatus" class="control-button" color="accent"
+            <button (click)="changeTask('editText')" *ngIf="editStatus" class="control-button" color="accent"
                     mat-icon-button>
                 <mat-icon>check</mat-icon>
             </button>
