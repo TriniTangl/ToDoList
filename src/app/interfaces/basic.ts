@@ -4,12 +4,6 @@ export interface ToDoItem {
     text: string;
 }
 
-export interface ToDoItemTransfer {
-    id: number;
-    active?: boolean;
-    text?: string;
-}
-
 export interface FilterStatus {
     all: boolean;
     active: boolean;

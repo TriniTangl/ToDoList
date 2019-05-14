@@ -7,14 +7,10 @@ import {ToDoItem} from '../interfaces/basic';
     styleUrls: ['./to-do-item.component.scss']
 })
 export class ToDoItemComponent implements OnInit {
-
     @Input() task: ToDoItem;
-
     @Output() changeTaskEmitter = new EventEmitter<ToDoItem>();
     @Output() removeTaskEmitter = new EventEmitter<number>();
-
     @ViewChild('editInput') editInput: ElementRef;
-
     public editStatus: boolean;
 
     constructor() {
@@ -24,7 +20,7 @@ export class ToDoItemComponent implements OnInit {
     ngOnInit() {
     }
 
-    changeTask(action: string): void {
+    public changeTask(action: string): void {
         switch (action) {
             case 'editText': {
                 this.editStatus = !this.editStatus;
@@ -45,11 +41,11 @@ export class ToDoItemComponent implements OnInit {
         });
     }
 
-    removeTask(): void {
+    public removeTask(): void {
         this.removeTaskEmitter.emit(this.task.id);
     }
 
-    startEditingTask(): void {
+    public startEditingTask(): void {
         this.editStatus = !this.editStatus;
         setTimeout(() => { // this will make the execution after the above boolean has changed ¯\_(ツ)_/¯
             this.editInput.nativeElement.focus();

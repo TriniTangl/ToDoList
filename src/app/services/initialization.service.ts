@@ -5,12 +5,11 @@ import {HttpClient} from '@angular/common/http';
     providedIn: 'root'
 })
 export class InitializationService {
-
     private dataLink: string = './assets/api/tasks.json';
 
     constructor(private http: HttpClient) { }
 
-    getInitialTasksList(): any {
+    public getInitialTasksList(): any {
         return this.http.get(this.dataLink, {});
     }
 }

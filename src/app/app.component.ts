@@ -10,18 +10,15 @@ import {MatCheckboxChange} from '@angular/material';
     styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-
     public taskList: Array<ToDoItem>;
     public renderList: Array<ToDoItem>;
     public filters: FilterStatus;
     public newTaskText: string;
-    public activeTasksCounter: number;
     public mainCheckboxStatus: boolean;
 
     constructor(private initializationService: InitializationService) {
         this.taskList = [];
         this.renderList = this.taskList;
-        this.activeTasksCounter = 0;
         this.mainCheckboxStatus = false;
         this.newTaskText = '';
         this.filters = {
@@ -50,11 +47,11 @@ export class AppComponent implements OnInit {
         this.updateRenderList();
     }
 
-    get activeTasksCount(): number {
+    public get activeTasksCount(): number {
         return this.taskList.filter(item => item.active === false).length;
     }
 
-    createNewTask(): void {
+    public createNewTask(): void {
         if (this.newTaskText.length > 0) {
             const item: ToDoItem = {
                 id: new Date().getTime(),
@@ -68,14 +65,14 @@ export class AppComponent implements OnInit {
         }
     }
 
-    updateTasksList(): void {
+    private updateTasksList(): void {
         if (LocalStorageService.checkData('TasksDB')) {
             this.taskList = LocalStorageService.getData('TasksDB');
             this.updateMainCheckbox();
         }
     }
 
-    updateRenderList(): void {
+    private updateRenderList(): void {
         if (this.filters.active) {
             this.filterTasks('active');
         } else if (this.filters.completed) {
@@ -86,15 +83,15 @@ export class AppComponent implements OnInit {
         this.updateMainCheckbox();
     }
 
-    updateLocalstorageData(): void {
+    private updateLocalstorageData(): void {
         LocalStorageService.setData('TasksDB', this.taskList);
     }
 
-    updateMainCheckbox(): void {
+    private updateMainCheckbox(): void {
         this.mainCheckboxStatus = this.taskList.every(item => item.active === true) && this.taskList.length > 0;
     }
 
-    filterTasks(type: string): void {
+    public filterTasks(type: string): void {
         this.filters = {
             all: false,
             active: false,
@@ -122,19 +119,19 @@ export class AppComponent implements OnInit {
         }
     }
 
-    changeAllTasksStatus(event: MatCheckboxChange): void {
+    public changeAllTasksStatus(event: MatCheckboxChange): void {
         this.taskList.forEach(item => item.active = event.checked);
         this.updateLocalstorageData();
         this.updateRenderList();
     }
 
-    clearCompletedTasks(): void {
+    public clearCompletedTasks(): void {
         this.taskList = this.taskList.filter(item => item.active === false);
         this.updateLocalstorageData();
         this.updateRenderList();
     }
 
-    changeTask(task: ToDoItem): void {
+    public changeTask(task: ToDoItem): void {
         const index: number = this.findTaskIndex(task.id);
         this.taskList[index].active = task.active;
         this.taskList[index].text = task.text;
@@ -142,13 +139,13 @@ export class AppComponent implements OnInit {
         this.updateRenderList();
     }
 
-    removeTask(id: number): void {
+    public removeTask(id: number): void {
         this.taskList.splice(this.findTaskIndex(id), 1);
         this.updateLocalstorageData();
         this.updateRenderList();
     }
 
-    findTaskIndex(id: number): number {
+    private findTaskIndex(id: number): number {
         return this.taskList.findIndex(item => item.id === id);
     }
 }
